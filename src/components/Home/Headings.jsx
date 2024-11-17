@@ -5,10 +5,8 @@ import ArticleList from "./Artcles";
 import { userAxiosInstance } from "../../utils/api/Interceptors";
 import { getArticlesApi, exploreApi } from "../../utils/api/api";
 import { userAxios } from "../../utils/api/ApiUrl";
-import { useNavigate } from "react-router-dom";
 
 export default function Headings({ user, modalOpen }) {
-  const navigate = useNavigate()
   let preference = [];
   let axiosCall;
   let api;
@@ -102,7 +100,7 @@ export default function Headings({ user, modalOpen }) {
             className={`cursor-pointer text-gray-400 hover:text-gray-600 ${
               startIndex === 0 && "opacity-50 cursor-not-allowed"
             }`}
-            onClick={handlePrev}
+            onClick={() => (user ? handlePrev : navigate("/auth/signup"))}
           >
             <IoIosArrowBack />
           </div>
@@ -141,7 +139,9 @@ export default function Headings({ user, modalOpen }) {
                   className={`flex content-center text-gray-500 cursor-pointer ${
                     active === item ? "border-b-2 border-black" : ""
                   }`}
-                  onClick={() => setActive(item)}
+                  onClick={() =>
+                    user ? setActive(item) : navigate("/auth/signup")
+                  }
                 >
                   <span
                     className={`${
@@ -154,39 +154,23 @@ export default function Headings({ user, modalOpen }) {
               ))}
           </div>
 
-          {user ? (
-
           <div
             className={`cursor-pointer text-gray-400 hover:text-gray-600 ${
               startIndex + itemsToShow - fixedItems >= preference.length
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
-            onClick={handleNext}
+            onClick={() => (user ? handleNext : navigate("/auth/signup"))}
           >
             <IoIosArrowForward />
           </div>
-          ):
-(
-          <div
-            className={`cursor-pointer text-gray-400 hover:text-gray-600 ${
-              startIndex + itemsToShow - fixedItems >= preference.length
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={()=>navigate('/auth/signup')}
-          >
-            <IoIosArrowForward />
-          </div>)
-          }
-
         </div>
       </div>
 
       <div className="min-h-screen ">
         <ArticleList articles={articles} user={user} />
       </div>
-    
+
       <style>{`
   /* Responsive adjustments */
 
