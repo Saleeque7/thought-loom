@@ -5,8 +5,10 @@ import ArticleList from "./Artcles";
 import { userAxiosInstance } from "../../utils/api/Interceptors";
 import { getArticlesApi, exploreApi } from "../../utils/api/api";
 import { userAxios } from "../../utils/api/ApiUrl";
+import { useNavigate } from "react-router-dom";
 
 export default function Headings({ user, modalOpen }) {
+  const navigate  =  useNavigate()
   let preference = [];
   let axiosCall;
   let api;
@@ -100,7 +102,7 @@ export default function Headings({ user, modalOpen }) {
             className={`cursor-pointer text-gray-400 hover:text-gray-600 ${
               startIndex === 0 && "opacity-50 cursor-not-allowed"
             }`}
-            onClick={() => (user ? handlePrev : navigate("/auth/signup"))}
+            onClick={() => (user ? handlePrev() : navigate("/auth/signup"))}
           >
             <IoIosArrowBack />
           </div>
@@ -160,7 +162,7 @@ export default function Headings({ user, modalOpen }) {
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
-            onClick={() => (user ? handleNext : navigate("/auth/signup"))}
+            onClick={() => (user ? handleNext() : navigate("/auth/signup"))}
           >
             <IoIosArrowForward />
           </div>
