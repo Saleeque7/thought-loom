@@ -16,8 +16,10 @@ import {
 import { Slide, toast, Flip } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-export default function WriteForm({ isWrite, form, user }) {
+export default React.memo(function WriteForm({ isWrite, form, user }) {
   const { id } = useParams();
   const [title, setTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
@@ -46,10 +48,13 @@ export default function WriteForm({ isWrite, form, user }) {
     try {
       const res = await userformAxiosInstance[apiMethod](apiUrl, data);
       if (res.data && res.data.status === "success") {
-        toast.success(id ? "Article updated successfully" : "Article created successfully", {
-          transition: Slide,
-          autoClose: 1000,
-        });
+        toast.success(
+          id ? "Article updated successfully" : "Article created successfully",
+          {
+            transition: Slide,
+            autoClose: 1000,
+          }
+        );
         clearForm();
         setTimeout(() => navigate(id ? "/profile" : "/"), 2000);
       }
@@ -119,10 +124,7 @@ export default function WriteForm({ isWrite, form, user }) {
 
         <div className="flex flex-col justify-center items-center p-6">
           <div className="bg-white rounded-lg w-full md:w-3/4 lg:w-2/3 p-6 min-h-screen">
-            <form
-              className="space-y-10"
-              onSubmit={handleFormSubmit}
-            >
+            <form className="space-y-10" onSubmit={handleFormSubmit}>
               <div className="mb-4">
                 <input
                   type="text"
@@ -140,6 +142,80 @@ export default function WriteForm({ isWrite, form, user }) {
                 setSubTitle={setSubTitle}
               />
 
+              {/* <div className="mb-6">
+                <div className="rounded-lg border border-gray-300 shadow-md">
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={content}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      setContent(data);
+                    }}
+                    config={{
+                      toolbar: [
+                        "heading",
+                        "|",
+                        "bold",
+                        "italic",
+                        "link",
+                        "bulletedList",
+                        "numberedList",
+                        "|",
+                        "blockQuote",
+                        "insertTable",
+                        "imageUpload",
+                        "mediaEmbed",
+                        "|",
+                        "undo",
+                        "redo",
+                      ],
+                      heading: {
+                        options: [
+                          {
+                            model: "paragraph",
+                            title: "Paragraph",
+                            class: "ck-heading_paragraph",
+                          },
+                          {
+                            model: "heading1",
+                            view: "h1",
+                            title: "Heading 1",
+                            class: "ck-heading_heading1",
+                          },
+                          {
+                            model: "heading2",
+                            view: "h2",
+                            title: "Heading 2",
+                            class: "ck-heading_heading2",
+                          },
+                          {
+                            model: "heading3",
+                            view: "h3",
+                            title: "Heading 3",
+                            class: "ck-heading_heading3",
+                          },
+                        ],
+                      },
+                      image: {
+                        toolbar: [
+                          "imageTextAlternative",
+                          "imageStyle:full",
+                          "imageStyle:side",
+                        ],
+                      },
+                      simpleUpload: {
+                        uploadUrl: "/api/upload-image", // Adjust with your actual API
+                        headers: {
+                          Authorization: "Bearer <your-token>", // Adjust with your actual token if required
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                {errors.content && (
+                  <p className="text-red-500 mt-2">{errors.content}</p>
+                )}
+              </div> */}
               <div className="mb-6">
                 <textarea
                   value={content}
@@ -151,6 +227,7 @@ export default function WriteForm({ isWrite, form, user }) {
                   <p className="text-red-500">{errors.content}</p>
                 )}
               </div>
+
               <ImageUpload errors={errors} image={image} setImage={setImage} />
               <div className="flex justify-center md:justify-end items-center">
                 <button
@@ -190,4 +267,4 @@ export default function WriteForm({ isWrite, form, user }) {
       </div>
     </>
   );
-}
+})

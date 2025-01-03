@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -8,7 +8,8 @@ import { stringToColor, getInitials } from "../../helpers/Helper";
 import Search from "../Helpers/Search";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar({ page, user }) {
+ function Navbar({ page, user }) {
+
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -132,3 +133,4 @@ export default function Navbar({ page, user }) {
     </>
   );
 }
+export default React.memo(Navbar)

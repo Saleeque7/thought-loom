@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FaPlus } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import ArticleList from "./Artcles";
@@ -8,10 +8,8 @@ import { userAxios } from "../../utils/api/ApiUrl";
 import { useNavigate } from "react-router-dom";
 
 export default function Headings({ user, modalOpen }) {
-  const navigate  =  useNavigate()
-  let preference = [];
-  let axiosCall;
-  let api;
+  const navigate = useNavigate();
+
   const landingPreference = [
     "Sports Insights",
     "Exploring the Universe",
@@ -27,33 +25,38 @@ export default function Headings({ user, modalOpen }) {
     "Creative Arts",
     "Health & Nutrition",
   ];
-  if (!user) {
-    preference = landingPreference;
-    axiosCall = userAxios;
-    api = exploreApi;
-  } else {
-    preference = user?.articlePreference || [];
-    axiosCall = userAxiosInstance;
-    api = getArticlesApi;
-  }
+
+  const { preference, axiosCall, api } = useMemo(() => {
+    return user
+      ? {
+          preference: user?.articlePreference || [],
+          axiosCall: userAxiosInstance,
+          api: getArticlesApi,
+        }
+      : {
+          preference: landingPreference,
+          axiosCall: userAxios,
+          api: exploreApi,
+        };
+  }, [user]);
 
   const [active, setActive] = useState("For you");
   const [startIndex, setStartIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(6);
   const [articles, setArticles] = useState([]);
+
   const fixedItems = startIndex < 1 ? 2 : 1;
+
+  const visiblePreferences = useMemo(() => {
+    return preference.slice(startIndex, startIndex + itemsToShow - fixedItems);
+  }, [preference, startIndex, itemsToShow, fixedItems]);
 
   useEffect(() => {
     const updateItemsToShow = () => {
-      if (window.innerWidth < 500) {
-        setItemsToShow(3);
-      } else if (window.innerWidth < 750) {
-        setItemsToShow(4);
-      } else if (window.innerWidth < 980) {
-        setItemsToShow(5);
-      } else {
-        setItemsToShow(6);
-      }
+      if (window.innerWidth < 500) setItemsToShow(3);
+      else if (window.innerWidth < 750) setItemsToShow(4);
+      else if (window.innerWidth < 980) setItemsToShow(5);
+      else setItemsToShow(6);
     };
 
     updateItemsToShow();
@@ -63,40 +66,34 @@ export default function Headings({ user, modalOpen }) {
   }, []);
 
   useEffect(() => {
-    const fetchArtictles = async () => {
+    const fetchArticles = async () => {
       try {
         const response = await axiosCall.get(`${api}?Head=${active}`);
-        console.log(response.data.articles, "articles");
-
         if (response.data && response.data.status === "success") {
           setArticles(response.data.articles);
         }
       } catch (error) {
-        if (error.response && error.response.data) {
-          const { message } = error.response.data;
-          console.log(" error message:", message);
-          console.log("An unexpected error occurred.", error.response.data);
-        }
+        console.error("Error fetching articles:", error.response?.data || error);
       }
     };
-    fetchArtictles();
-  }, [active]);
+    fetchArticles();
+  }, [active, axiosCall, api]);
 
   const handleNext = () => {
     if (startIndex + itemsToShow - fixedItems < preference.length) {
-      setStartIndex(startIndex + 1);
+      setStartIndex((prev) => prev + 1);
     }
   };
 
   const handlePrev = () => {
     if (startIndex > 0) {
-      setStartIndex(startIndex - 1);
+      setStartIndex((prev) => prev - 1);
     }
   };
 
   return (
     <>
-      <div className=" pt-5 flex justify-center w-full overflow-hidden  sticky top-0 bg-white z-50">
+      <div className="pt-5 flex justify-center w-full overflow-hidden sticky top-0 bg-white z-50">
         <div className="flex items-center space-x-0 md:space-x-4 max-w-screen-lg">
           <div
             className={`cursor-pointer text-gray-400 hover:text-gray-600 ${
@@ -111,11 +108,13 @@ export default function Headings({ user, modalOpen }) {
             {startIndex < 1 && (
               <>
                 {user && (
-                  <div className="cursor-pointer text-gray-700 hover:bg-gray-200 rounded-full p-1">
-                    <FaPlus onClick={modalOpen} />
+                  <div
+                    className="cursor-pointer text-gray-700 hover:bg-gray-200 rounded-full p-1"
+                    onClick={modalOpen}
+                  >
+                    <FaPlus />
                   </div>
                 )}
-
                 <div
                   className={`cursor-pointer text-gray-500 ${
                     active === "For you" ? "border-b-2 border-black" : ""
@@ -133,27 +132,25 @@ export default function Headings({ user, modalOpen }) {
               </>
             )}
 
-            {preference
-              .slice(startIndex, startIndex + itemsToShow - fixedItems)
-              .map((item, index) => (
-                <div
-                  key={index}
-                  className={`flex content-center text-gray-500 cursor-pointer ${
-                    active === item ? "border-b-2 border-black" : ""
+            {visiblePreferences.map((item, index) => (
+              <div
+                key={index}
+                className={`flex content-center text-gray-500 cursor-pointer ${
+                  active === item ? "border-b-2 border-black" : ""
+                }`}
+                onClick={() =>
+                  user ? setActive(item) : navigate("/auth/signup")
+                }
+              >
+                <span
+                  className={`${
+                    active === item ? "text-icons font-semibold" : ""
                   }`}
-                  onClick={() =>
-                    user ? setActive(item) : navigate("/auth/signup")
-                  }
                 >
-                  <span
-                    className={`${
-                      active === item ? "text-icons font-semibold" : ""
-                    }`}
-                  >
-                    {item}
-                  </span>
-                </div>
-              ))}
+                  {item}
+                </span>
+              </div>
+            ))}
           </div>
 
           <div
@@ -169,30 +166,9 @@ export default function Headings({ user, modalOpen }) {
         </div>
       </div>
 
-      <div className="min-h-screen ">
+      <div className="min-h-screen">
         <ArticleList articles={articles} user={user} />
       </div>
-
-      <style>{`
-  /* Responsive adjustments */
-
-
-  /* Scrollbar hiding for smoother appearance */
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Screen-specific adjustments */
-  @media (max-width: 640px) {
-    .space-x-8 {
-      gap: 1rem;
-    }
-  }
-`}</style>
     </>
   );
 }

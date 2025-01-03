@@ -6,13 +6,11 @@ import { useSelector } from "react-redux";
 
 export default function Landing() {
   const user = useSelector((state) => state.persisted.user.user);
- 
-
 
   return (
     <>
       <Transition>
-        <Header page={"landing"} user={user}/>
+        <Header page={"landing"} user={user} />
         <div>
           <hr style={{ borderColor: "#ecebf3", borderStyle: "solid" }} />
         </div>

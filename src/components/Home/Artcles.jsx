@@ -1,4 +1,4 @@
-import React from "react";
+import React ,{lazy , Suspense} from "react";
 import {
   getInitials,
   stringToColor,
@@ -7,41 +7,49 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { BiDislike, BiLike, BiSolidDislike, BiSolidLike } from "react-icons/bi";
+const Empty =  lazy(()=>import ("../Lottie/Empty"))
 
-export default function ArticleList({ articles, user }) {
+export default React.memo(function ArticleList({ articles, user }) {
   const navigate = useNavigate();
   const handleLike = (e) => {
     e.stopPropagation();
   };
 
-  if (!articles || articles.length === 0) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center mx-auto my-8">
-        <div className="text-center mt-10">
-          <h2 className="text-xl font-semibold text-gray-700">
-            No Articles Available
-          </h2>
-          <p className="text-gray-500">You can create your own article.</p>
-          <div className="flex justify-center mt-4">
-            <div
-              className="flex items-center space-x-2 group hover:text-gray-900"
-              onClick={() => navigate(user ? "/write" : "/auth/signup")}
-            >
-              <FaEdit
-                size={22}
-                className="text-gray-500 group-hover:text-icons"
-              />
-              <span className="text-gray-500 group-hover:text-icons">
-                Write
-              </span>
+ 
+  return (
+    <>
+   {!articles || articles.length === 0 ?
+    (
+      <Suspense fallback={<div>Loading...</div>}>
+        <div className="min-h-[50vh] flex flex-col items-center justify-center mx-auto my-8">
+          <div className="mt-6">
+            <Empty/>
+          </div>
+          <div className="text-center mt-10">
+            <h2 className="text-xl font-semibold text-gray-700">
+              No Articles Available
+            </h2>
+            <p className="text-gray-500">You can create your own article.</p>
+            <div className="flex justify-center mt-4">
+              <div
+                className="flex items-center space-x-2 group hover:text-gray-900 cursor-pointer"
+                onClick={() => navigate(user ? "/write" : "/auth/signup")}
+              >
+                <FaEdit
+                  size={22}
+                  className="text-gray-500 group-hover:text-icons"
+                />
+                <span className="text-gray-500 group-hover:text-icons">
+                  Write
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
-  return (
-    <div className="max-w-5xl mx-auto my-8 ">
+      </Suspense>
+    )
+    :
+   ( <div className="max-w-5xl mx-auto my-8 ">
       {articles.map(
         (article) =>
           article?.author?._id !== user?._id && (
@@ -132,6 +140,8 @@ export default function ArticleList({ articles, user }) {
             </React.Fragment>
           )
       )}
-    </div>
+    </div>)
+  }
+  </>
   );
-}
+});
