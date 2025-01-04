@@ -15,11 +15,8 @@ export default React.memo(function ArticleList({ articles, user }) {
     e.stopPropagation();
   };
 
- 
-  return (
-    <>
-   {!articles || articles.length === 0 ?
-    (
+  if (!articles || articles.length === 0) {
+    return (
       <Suspense fallback={<div>Loading...</div>}>
         <div className="min-h-[50vh] flex flex-col items-center justify-center mx-auto my-8">
           <div className="mt-6">
@@ -47,9 +44,10 @@ export default React.memo(function ArticleList({ articles, user }) {
           </div>
         </div>
       </Suspense>
-    )
-    :
-   ( <div className="max-w-5xl mx-auto my-8 ">
+    );
+  }
+  return (
+    <div className="max-w-5xl mx-auto my-8 ">
       {articles.map(
         (article) =>
           article?.author?._id !== user?._id && (
@@ -140,8 +138,6 @@ export default React.memo(function ArticleList({ articles, user }) {
             </React.Fragment>
           )
       )}
-    </div>)
-  }
-  </>
+    </div>
   );
 });

@@ -21,7 +21,7 @@ export default function Dashboard({user}) {
   };
 
   const handleEdit=()=>{
-    console.log("hii");
+    // console.log("hii");
     
   }
 

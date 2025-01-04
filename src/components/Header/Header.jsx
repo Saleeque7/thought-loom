@@ -7,11 +7,18 @@ import { FaEdit } from "react-icons/fa";
 import { stringToColor, getInitials } from "../../helpers/Helper";
 import Search from "../Helpers/Search";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { userLogout } from "../../utils/Redux/userSlice";
 
  function Navbar({ page, user }) {
+  const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(userLogout());
+  };
 
   return (
     <>
@@ -98,17 +105,23 @@ import { useNavigate } from "react-router-dom";
               {user ? (
                 <>
                   <Link
-                    to="/notification"
+                    to="/write"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
                   >
-                    Notifications
+                    write
                   </Link>
                   <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                  >
+                    profile
+                  </Link>
+                  <span onClick={handleLogout}
                     to="/logout"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
                   >
                     Logout
-                  </Link>
+                  </span>
                 </>
               ) : (
                 <>
